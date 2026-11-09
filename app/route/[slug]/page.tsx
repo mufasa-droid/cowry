@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getRoute, getPlace } from "@/lib/brt-local";
 
 interface RoutePageProps {
   params: {
     slug: string;
+  };
+}
+
+export function generateMetadata({ params }: RoutePageProps): Metadata {
+  const route = getRoute(params.slug);
+  if (!route) {
+    return { title: "Route not found" };
+  }
+  const fromPlace = getPlace(route.from);
+  const toPlace = getPlace(route.to);
+  const fromName = fromPlace ? fromPlace.name : route.from;
+  const toName = toPlace ? toPlace.name : route.to;
+  return {
+    title: `${fromName} to ${toName}`,
   };
 }
 
@@ -42,7 +57,10 @@ export default function RoutePage({ params }: RoutePageProps) {
         </main>
 
         <footer className="mt-auto px-4 py-3.5 bg-cowry-footer border-t border-cowry-border text-center text-xs text-cowry-muted">
-          Unofficial prototype. Sample data. Times are estimates.
+          Unofficial prototype. Sample data. Times are estimates. ·{" "}
+          <Link href="/about" className="underline hover:text-cowry-primary">
+            About this demo
+          </Link>
         </footer>
       </div>
     );
@@ -285,7 +303,10 @@ export default function RoutePage({ params }: RoutePageProps) {
 
       {/* Footer Strip */}
       <footer className="mt-auto px-4 py-3.5 bg-cowry-footer border-t border-cowry-border text-center text-xs text-cowry-muted">
-        Unofficial prototype. Sample data. Times are estimates.
+        Unofficial prototype. Sample data. Times are estimates. ·{" "}
+        <Link href="/about" className="underline hover:text-cowry-primary">
+          About this demo
+        </Link>
       </footer>
     </div>
   );

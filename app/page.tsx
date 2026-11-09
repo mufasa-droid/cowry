@@ -19,6 +19,8 @@ export default function NearbyPage() {
   const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
+    document.title = "Nearby | BRT Lagos Demo";
+
     if (typeof window === "undefined" || !navigator.geolocation) {
       setLocationStatus("unavailable");
       setPlacesList(getAllPlaces());
@@ -150,13 +152,21 @@ export default function NearbyPage() {
           )}
         </div>
 
-        {/* Loading State */}
+        {/* Loading State Skeleton */}
         {locationStatus === "loading" && placesList.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-7 h-7 border-3 border-cowry-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-cowry-muted">
-              Locating closest BRT stops...
-            </p>
+          <div className="space-y-3" aria-label="Loading nearby stops">
+            {[1, 2, 3].map((n) => (
+              <div
+                key={`skeleton-${n}`}
+                className="p-4 bg-slate-50 border border-cowry-border rounded-xl animate-pulse"
+              >
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="h-5 bg-slate-200 rounded w-1/3" />
+                  <div className="h-4 bg-slate-200 rounded w-16" />
+                </div>
+                <div className="h-3 bg-slate-200 rounded w-1/4" />
+              </div>
+            ))}
           </div>
         ) : (
           /* Places List */
@@ -229,7 +239,10 @@ export default function NearbyPage() {
 
       {/* Footer Strip */}
       <footer className="mt-auto px-4 py-3.5 bg-cowry-footer border-t border-cowry-border text-center text-xs text-cowry-muted">
-        Unofficial prototype. Sample data. Times are estimates.
+        Unofficial prototype. Sample data. Times are estimates. ·{" "}
+        <Link href="/about" className="underline hover:text-cowry-primary">
+          About this demo
+        </Link>
       </footer>
     </div>
   );

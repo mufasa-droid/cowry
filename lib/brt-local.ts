@@ -61,6 +61,7 @@ export function getDepartures(slug: string) {
 export function queueLabel(busesWaiting: number | null, minAgo: number | null) {
   if (busesWaiting === null) return "No recent update";
   const n = busesWaiting === 1 ? "1 bus waiting" : `${busesWaiting} buses waiting`;
+  if (minAgo === 0) return `${n} · updated just now`;
   return `${n} · updated ${minAgo} min ago`;
 }
 

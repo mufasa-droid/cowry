@@ -24,6 +24,7 @@ function TripPlannerContent() {
 
   // Sync state if URL query changes
   useEffect(() => {
+    document.title = "Plan a trip | BRT Lagos Demo";
     const qFrom = searchParams.get("from") || "";
     const qTo = searchParams.get("to") || "";
     setFromSlug((prev) => (prev !== qFrom ? qFrom : prev));
@@ -371,7 +372,10 @@ function TripPlannerContent() {
 
       {/* Footer Strip */}
       <footer className="mt-auto px-4 py-3.5 bg-cowry-footer border-t border-cowry-border text-center text-xs text-cowry-muted">
-        Unofficial prototype. Sample data. Times are estimates.
+        Unofficial prototype. Sample data. Times are estimates. ·{" "}
+        <Link href="/about" className="underline hover:text-cowry-primary">
+          About this demo
+        </Link>
       </footer>
     </div>
   );

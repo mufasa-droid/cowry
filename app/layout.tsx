@@ -2,8 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Cowry BRT Lagos",
-  description: "Mobile-first BRT Lagos departures and bus stop guide",
+  title: {
+    default: "BRT Lagos Demo",
+    template: "%s | BRT Lagos Demo",
+  },
+  description: "Mobile-first BRT Lagos departures, flat fares, and bus stop guide",
 };
 
 export const viewport: Viewport = {
