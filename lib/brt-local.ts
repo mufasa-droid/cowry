@@ -33,6 +33,14 @@ export function getAllPlaces() {
   }));
 }
 
+export function getPlace(slug: string): Place | undefined {
+  return places.find((p) => p.slug === slug);
+}
+
+export function getRoute(slug: string): Route | undefined {
+  return routes.find((r) => r.slug === slug);
+}
+
 // ---------- departures from a place ----------
 export const routesFrom = (slug: string) => routes.filter((r) => r.from === slug);
 
