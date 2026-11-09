@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1558B0;
+  --color-text: #0B1F3A;
+  --color-muted: #4A5D78;
+  --color-border: #D6E0EE;
+  --color-footer: #EEF3FA;
+  --color-pill: #E8F0FB;
+}
+
+body {
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure focus states are distinct and accessible */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
