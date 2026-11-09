@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getNearbyPlaces, getAllPlaces, type Place } from "@/lib/brt-local";
 
 type PlaceWithMeta = Place & {
@@ -10,6 +11,7 @@ type PlaceWithMeta = Place & {
 };
 
 export default function NearbyPage() {
+  const router = useRouter();
   const [placesList, setPlacesList] = useState<PlaceWithMeta[]>([]);
   const [locationStatus, setLocationStatus] = useState<
     "loading" | "granted" | "denied" | "unavailable"
@@ -71,7 +73,7 @@ export default function NearbyPage() {
           </span>
         </div>
 
-        {/* Visual search input (slice 1 presentation) */}
+        {/* Destination picker navigating to /plan?to=<slug> */}
         <div className="relative mt-2">
           <label htmlFor="search-destination" className="sr-only">
             Where are you going?
@@ -92,13 +94,41 @@ export default function NearbyPage() {
               />
             </svg>
           </div>
-          <input
+          <select
             id="search-destination"
-            type="text"
-            readOnly
-            placeholder="Where are you going?"
-            className="w-full min-h-touch pl-11 pr-4 py-2.5 bg-slate-50 border border-cowry-border rounded-xl text-sm text-cowry-text placeholder-cowry-muted focus:outline-none focus:ring-2 focus:ring-cowry-primary focus:bg-white cursor-pointer transition-colors"
-          />
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value) {
+                router.push(`/plan?to=${e.target.value}`);
+              }
+            }}
+            className="w-full min-h-touch pl-11 pr-10 py-2.5 bg-slate-50 border border-cowry-border rounded-xl text-sm text-cowry-text focus:outline-none focus:ring-2 focus:ring-cowry-primary focus:bg-white cursor-pointer transition-colors appearance-none"
+          >
+            <option value="" disabled>
+              Where are you going?
+            </option>
+            {getAllPlaces().map((p) => (
+              <option key={p.slug} value={p.slug}>
+                {p.name} ({p.type === "terminal" ? "Terminal" : "Stop"})
+              </option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-cowry-muted">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
       </header>
 

@@ -37,6 +37,8 @@ export const routes: Route[] = [
   { slug: "oshodi-ayobo",       service: "brt",      from: "oshodi",      to: "ayobo",    via: [],              fareNgn: 890,  headwayMin: [15, 25], verified: false },
   { slug: "iyana-ipaja-obalende", service: "standard", from: "iyana-ipaja", to: "obalende", via: [],            fareNgn: 1090, headwayMin: [10, 15], verified: false },
   { slug: "ikeja-obalende",     service: "standard", from: "ikeja",       to: "obalende", via: [],              fareNgn: 720,  headwayMin: [5, 8],   verified: false },
+  { slug: "iyana-ipaja-ikeja",  service: "standard", from: "iyana-ipaja", to: "ikeja",    via: [],              fareNgn: 440,  headwayMin: [10, 15], verified: false },
+  { slug: "ayobo-obalende",     service: "standard", from: "ayobo",       to: "obalende", via: [],              fareNgn: 1260, headwayMin: [15, 25], verified: false },
 ];
 
 // Demo-only "buses waiting" snapshots. Clearly sample numbers, not live.
