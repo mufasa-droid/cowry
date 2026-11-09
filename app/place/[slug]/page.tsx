@@ -55,7 +55,9 @@ export default function PlacePage({ params }: PlacePageProps) {
 
   // Subtitle wording per business rules
   let subtitleText = "";
-  if (isTerminal) {
+  if (routeCount === 0) {
+    subtitleText = `${isTerminal ? "Terminal" : "Bus stop"} · No routes currently listed in demo`;
+  } else if (isTerminal) {
     const routeSuffix = routeCount === 1 ? "route" : "routes";
     subtitleText = `Terminal · ${routeCount} ${routeSuffix} · buses leaving from here`;
   } else {
@@ -103,10 +105,16 @@ export default function PlacePage({ params }: PlacePageProps) {
         </div>
 
         {departures.length === 0 ? (
-          <div className="p-6 text-center border border-dashed border-cowry-border rounded-xl">
-            <p className="text-sm text-cowry-muted">
-              No active departures from this location currently listed.
+          <div className="py-10 px-6 text-center border border-dashed border-cowry-border rounded-xl">
+            <p className="text-sm font-medium text-cowry-text mb-4">
+              No routes leave from here in this demo
             </p>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 bg-cowry-primary text-white rounded-xl text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors"
+            >
+              Back to Nearby
+            </Link>
           </div>
         ) : isSingleRouteStop ? (
           /* Single Route Stop: A single featured card, not a board */
