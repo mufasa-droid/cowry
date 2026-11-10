@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
 import "./globals.css";
 
 const serifFont = Source_Serif_4({
@@ -22,6 +23,21 @@ export const metadata: Metadata = {
     template: "%s | BRT Lagos Demo",
   },
   description: "Classic minimal BRT Lagos departures, flat fares, and bus stop guide",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BRT Lagos",
+  },
+  icons: {
+    apple: [
+      {
+        url: "/icons/apple-touch-icon",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -39,6 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${serifFont.variable} ${sansFont.variable}`}>
       <body className="min-h-screen bg-white font-sans text-cowry-ink flex flex-col antialiased">
+        <ServiceWorkerRegister />
         <Header />
         <main className="max-w-[1120px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 flex flex-col">
           {children}
