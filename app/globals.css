@@ -4,21 +4,25 @@
 
 :root {
   --color-primary: #1558B0;
-  --color-text: #0B1F3A;
+  --color-ink: #0B1F3A;
   --color-muted: #4A5D78;
-  --color-border: #D6E0EE;
-  --color-footer: #EEF3FA;
-  --color-pill: #E8F0FB;
+  --color-hairline: #D6E0EE;
+  --color-footer: #F7F9FC;
 }
 
 body {
-  color: var(--color-text);
+  color: var(--color-ink);
   background-color: #FFFFFF;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ensure focus states are distinct and accessible */
+/* Tabular numerals for all fares and time data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ensure focus states are distinct, visible, and accessible (WCAG AA) */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -27,7 +31,14 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* Respect user's motion preferences */
+/* No shadows anywhere in the classic minimal design */
+*,
+*::before,
+*::after {
+  box-shadow: none !important;
+}
+
+/* Motion: none, except respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -38,4 +49,3 @@ select:focus-visible {
     scroll-behavior: auto !important;
   }
 }
-

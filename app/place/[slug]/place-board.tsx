@@ -7,8 +7,8 @@ import {
   getDepartures,
   queueLabel,
   reportQueue,
-  type Place,
 } from "@/lib/brt-local";
+import NearbyMasterList from "@/app/components/NearbyMasterList";
 
 interface PlaceBoardProps {
   slug: string;
@@ -54,40 +54,19 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
 
   if (!place) {
     return (
-      <div className="flex flex-col min-h-screen bg-white">
-        <header className="p-4 border-b border-cowry-border flex items-center justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm font-medium text-cowry-primary hover:underline min-h-touch min-w-touch"
-          >
-            ← Back to Nearby
-          </Link>
-          <span className="text-xs font-semibold px-2.5 py-1 bg-cowry-pill text-cowry-primary border border-[#BCD0ED] rounded-full">
-            Demo data
-          </span>
-        </header>
-
-        <main className="flex-1 p-6 flex flex-col justify-center items-center text-center">
-          <h1 className="text-2xl font-bold text-cowry-text mb-2">
-            Place not found
-          </h1>
-          <p className="text-sm text-cowry-muted mb-6 max-w-xs">
-            We couldn&apos;t find the requested stop or terminal in our system.
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center min-h-touch px-6 py-2.5 bg-cowry-primary text-white rounded-xl text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors"
-          >
-            Return to Nearby
-          </Link>
-        </main>
-
-        <footer className="mt-auto px-4 py-3.5 bg-cowry-footer border-t border-cowry-border text-center text-xs text-cowry-muted">
-          Unofficial prototype. Sample data. Times are estimates. ·{" "}
-          <Link href="/about" className="underline hover:text-cowry-primary">
-            About this demo
-          </Link>
-        </footer>
+      <div className="w-full py-12 flex flex-col justify-center items-center text-center">
+        <h1 className="font-serif text-2xl font-bold text-cowry-ink mb-2">
+          Place not found
+        </h1>
+        <p className="text-sm text-cowry-muted mb-6 max-w-xs">
+          We couldn&apos;t find the requested stop or terminal in our system.
+        </p>
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center min-h-touch px-6 py-2.5 bg-cowry-primary text-white rounded-sm text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors"
+        >
+          Return to Nearby
+        </Link>
       </div>
     );
   }
@@ -111,7 +90,6 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
   const openReportPanel = () => {
     setIsReporting(true);
     setConfirmationMsg("");
-    // If only one route, preselect it
     if (departures.length === 1) {
       setSelectedRoute(departures[0].route.slug);
     } else if (!selectedRoute && departures.length > 0) {
@@ -122,15 +100,12 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
   const handleSendReport = () => {
     if (selectedCount === null || !selectedRoute) return;
 
-    // Map 5+ to 5 (count is capped at 5 in number model)
     const countValue = Math.min(selectedCount, 5);
     reportQueue(selectedRoute, countValue);
 
-    // Refresh departures state immediately
     const updated = getDepartures(place.slug);
     setDepartures(updated);
 
-    // Close panel and show polite confirmation
     setIsReporting(false);
     setSelectedCount(null);
     setConfirmationMsg("Thanks. Report saved for this demo.");
@@ -146,10 +121,16 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
   const countOptions = [0, 1, 2, 3, 4, 5];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Top Header */}
-      <header className="px-5 pt-5 pb-4 border-b border-cowry-border">
-        <div className="flex items-center justify-between mb-3">
+    <div className="w-full flex flex-col lg:flex-row gap-8 lg:gap-10">
+      {/* Left Column on Desktop (Master List) */}
+      <div className="hidden lg:block lg:w-[380px] lg:flex-shrink-0">
+        <NearbyMasterList selectedSlug={place.slug} />
+      </div>
+
+      {/* Right Column: Place Departure Board */}
+      <div className="flex-1 lg:border-l lg:border-cowry-hairline lg:pl-10 space-y-6">
+        {/* Mobile Back Button (hidden on desktop master-detail) */}
+        <div className="lg:hidden -mt-1 mb-2">
           <Link
             href="/"
             className="inline-flex items-center text-sm font-medium text-cowry-primary hover:underline min-h-touch min-w-touch"
@@ -157,57 +138,48 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
           >
             ← Back to Nearby
           </Link>
-          <span
-            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cowry-pill text-cowry-primary border border-[#BCD0ED]"
-            aria-label="Demo data mode"
-          >
-            Demo data
-          </span>
         </div>
 
-        <h1 className="text-2xl font-bold tracking-tight text-cowry-text">
-          {place.name}
-        </h1>
-        <p className="text-sm text-cowry-muted mt-1 leading-snug">
-          {subtitleText}
-        </p>
-      </header>
-
-      {/* Departures Content */}
-      <main className="flex-1 px-5 py-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-cowry-text">
-            {isTerminal ? "Departures Board" : "Route & Departures"}
-          </h2>
-          <span className="text-xs text-cowry-muted">
-            {routeCount} {routeCount === 1 ? "departure" : "departures"}
-          </span>
+        {/* Place Header */}
+        <div className="border-b border-cowry-hairline pb-4">
+          <div className="flex items-baseline gap-2.5 flex-wrap">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-cowry-ink">
+              {place.name}
+            </h1>
+            <span className="text-xs text-cowry-muted border border-cowry-hairline px-1.5 py-0.5 rounded-sm">
+              {isTerminal ? "Terminal" : "Bus stop"}
+            </span>
+          </div>
+          <p className="text-sm text-cowry-muted mt-1 leading-snug">
+            {subtitleText}
+          </p>
         </div>
 
         {/* Polite Screen Reader Live Announcement */}
         <div
           role="status"
           aria-live="polite"
-          className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2.5 transition-all empty:hidden"
+          className="text-xs font-semibold text-cowry-ink bg-slate-50 border border-cowry-hairline rounded-sm p-3 transition-all empty:hidden"
         >
           {confirmationMsg}
         </div>
 
+        {/* Empty State */}
         {departures.length === 0 ? (
-          <div className="py-10 px-6 text-center border border-dashed border-cowry-border rounded-xl">
-            <p className="text-sm font-medium text-cowry-text mb-4">
+          <div className="py-10 px-6 text-center border border-dashed border-cowry-hairline rounded-sm">
+            <p className="text-sm font-medium text-cowry-ink mb-4">
               No routes leave from here in this demo
             </p>
             <Link
               href="/"
-              className="inline-flex items-center justify-center min-h-touch px-5 py-2.5 bg-cowry-primary text-white rounded-xl text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors"
+              className="inline-flex items-center justify-center min-h-touch px-5 py-2.5 bg-cowry-primary text-white rounded-sm text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors"
             >
               Back to Nearby
             </Link>
           </div>
         ) : isSingleRouteStop ? (
-          /* Single Route Stop: A single featured card, not a board */
-          <div className="space-y-3">
+          /* Single Route Stop: Clean stacked timetable format */
+          <div className="space-y-4">
             {departures.map((dep) => {
               const queueText = queueLabel(
                 dep.busesWaiting,
@@ -219,156 +191,178 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
                 <Link
                   key={dep.route.slug}
                   href={`/route/${dep.route.slug}`}
-                  className="block p-5 bg-white border border-cowry-border rounded-xl hover:border-cowry-primary hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-all active:scale-[0.99] min-h-[44px]"
+                  className="group block p-4 border border-cowry-hairline rounded-sm hover:border-cowry-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors min-h-touch"
                 >
-                  <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="flex items-start justify-between gap-4 mb-3">
                     <div>
-                      <span className="text-xs font-medium text-cowry-muted uppercase tracking-wider block mb-0.5">
-                        Destination
+                      <span className="text-[11px] font-semibold text-cowry-muted uppercase tracking-wider block mb-0.5">
+                        Route
                       </span>
-                      <h3 className="font-bold text-lg text-cowry-text">
+                      <h2 className="font-serif text-lg font-bold text-cowry-ink group-hover:text-cowry-primary transition-colors">
                         To {dep.headingTo}
-                      </h3>
+                      </h2>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs font-medium text-cowry-muted block mb-0.5">
+                    <div className="text-right flex-shrink-0">
+                      <span className="text-[11px] font-semibold text-cowry-muted uppercase tracking-wider block mb-0.5">
                         Flat fare
                       </span>
-                      <span className="text-xl font-bold text-cowry-primary">
+                      <span className="text-2xl font-bold text-cowry-primary tabular-nums">
                         ₦{dep.route.fareNgn}
                       </span>
                     </div>
                   </div>
 
-                  {/* Queue Status Line */}
-                  <div className="text-sm text-cowry-muted mb-3 flex items-center gap-1.5">
-                    <span
-                      className={`inline-block w-2 h-2 rounded-full ${
-                        dep.busesWaiting !== null && dep.busesWaiting > 0
-                          ? "bg-emerald-500"
-                          : "bg-slate-400"
-                      }`}
-                      aria-hidden="true"
-                    />
-                    <span className="font-medium text-cowry-text">
-                      {queueText}
-                    </span>
-                  </div>
-
-                  {/* Wait Estimate Pill & Chevron */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-cowry-pill text-[#0B3A7A]">
-                      Est. wait {minWait} to {maxWait} min (estimate)
-                    </span>
-                    <span className="text-xs font-medium text-cowry-primary flex items-center gap-1">
-                      Route details →
-                    </span>
+                  <div className="pt-2 border-t border-cowry-hairline flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-cowry-muted">
+                    <div className="flex items-center gap-1.5 font-medium text-cowry-ink">
+                      <span>{queueText}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-cowry-muted">
+                        Est. wait {minWait} to {maxWait} min (estimate)
+                      </span>
+                      <span className="text-cowry-primary font-medium group-hover:underline">
+                        Details →
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );
             })}
           </div>
         ) : (
-          /* Terminal: Compact departure board list with dividers */
-          <div className="border border-cowry-border rounded-xl bg-white overflow-hidden divide-y divide-cowry-border shadow-sm">
-            {departures.map((dep) => {
-              const queueText = queueLabel(
-                dep.busesWaiting,
-                dep.updatedMinAgo
-              );
-              const [minWait, maxWait] = dep.estWaitMin;
+          /* Multi-route Terminal: Timetable Table on md+, Stacked on mobile */
+          <div className="space-y-2">
+            {/* Desktop / Tablet Timetable Table (md+) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-cowry-hairline text-xs font-semibold text-cowry-muted uppercase tracking-wider">
+                    <th scope="col" className="py-2.5 px-3">Destination</th>
+                    <th scope="col" className="py-2.5 px-3 text-right">Flat Fare</th>
+                    <th scope="col" className="py-2.5 px-3">Buses Waiting</th>
+                    <th scope="col" className="py-2.5 px-3">Estimated Wait</th>
+                    <th scope="col" className="py-2.5 px-2 text-right"><span className="sr-only">Details</span></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-cowry-hairline border-b border-cowry-hairline text-sm">
+                  {departures.map((dep) => {
+                    const queueText = queueLabel(
+                      dep.busesWaiting,
+                      dep.updatedMinAgo
+                    );
+                    const [minWait, maxWait] = dep.estWaitMin;
 
-              return (
-                <Link
-                  key={dep.route.slug}
-                  href={`/route/${dep.route.slug}`}
-                  className="block p-4 min-h-[44px] hover:bg-slate-50 focus-visible:outline-none focus-visible:bg-slate-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cowry-primary transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-3 mb-1.5">
-                    <span className="font-bold text-base text-cowry-text">
-                      To {dep.headingTo}
-                    </span>
-                    <span className="font-bold text-base text-cowry-primary flex-shrink-0">
-                      ₦{dep.route.fareNgn}
-                    </span>
-                  </div>
-
-                  <div className="text-xs text-cowry-muted mb-2.5 font-medium">
-                    {queueText}
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-cowry-pill text-[#0B3A7A]">
-                      Est. wait {minWait} to {maxWait} min (estimate)
-                    </span>
-                    <span className="text-cowry-muted text-xs flex items-center">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
+                    return (
+                      <tr
+                        key={dep.route.slug}
+                        className="group hover:bg-slate-50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          window.location.href = `/route/${dep.route.slug}`;
+                        }}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+                        <td className="py-3 px-3 font-semibold text-cowry-ink group-hover:text-cowry-primary transition-colors">
+                          <Link href={`/route/${dep.route.slug}`} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary rounded-sm">
+                            To {dep.headingTo}
+                          </Link>
+                        </td>
+                        <td className="py-3 px-3 text-right font-bold text-cowry-primary tabular-nums">
+                          ₦{dep.route.fareNgn}
+                        </td>
+                        <td className="py-3 px-3 text-xs text-cowry-ink font-medium">
+                          {queueText}
+                        </td>
+                        <td className="py-3 px-3 text-xs text-cowry-muted">
+                          {minWait}–{maxWait} min (estimate)
+                        </td>
+                        <td className="py-3 px-2 text-right text-xs text-cowry-muted group-hover:text-cowry-primary transition-colors" aria-hidden="true">
+                          →
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Stacked Rows (< md) */}
+            <div className="md:hidden divide-y divide-cowry-hairline border-t border-b border-cowry-hairline">
+              {departures.map((dep) => {
+                const queueText = queueLabel(
+                  dep.busesWaiting,
+                  dep.updatedMinAgo
+                );
+                const [minWait, maxWait] = dep.estWaitMin;
+
+                return (
+                  <Link
+                    key={dep.route.slug}
+                    href={`/route/${dep.route.slug}`}
+                    className="block py-3 px-1 min-h-touch hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary"
+                  >
+                    <div className="flex items-baseline justify-between gap-2 mb-1">
+                      <span className="font-semibold text-sm text-cowry-ink">
+                        To {dep.headingTo}
+                      </span>
+                      <span className="font-bold text-sm text-cowry-primary tabular-nums">
+                        ₦{dep.route.fareNgn}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-cowry-muted mt-0.5">
+                      <span className="text-cowry-ink font-medium">{queueText}</span>
+                      <span>{minWait}–{maxWait} min (estimate)</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
 
-        {/* Flat fare notice */}
-        <p className="text-xs text-cowry-muted text-center">
+        {/* Business Rule Notice */}
+        <p className="text-xs text-cowry-muted">
           Fare is the same wherever you get down.
         </p>
 
-        {/* PART A: Report buses waiting Section */}
+        {/* Report Buses Waiting Section */}
         {departures.length > 0 && (
-          <section className="pt-2">
+          <div className="pt-2">
             {!isReporting ? (
               <div className="space-y-2">
                 <button
                   type="button"
                   ref={reportButtonRef}
                   onClick={openReportPanel}
-                  className="w-full min-h-touch px-4 py-3 bg-cowry-primary text-white rounded-xl text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary focus-visible:ring-offset-2 transition-colors shadow-sm flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto min-h-touch px-5 py-2.5 bg-cowry-primary text-white rounded-sm text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary transition-colors"
                 >
-                  <span>I&apos;m here: report buses waiting</span>
+                  I&apos;m here: report buses waiting
                 </button>
-                <p className="text-[11px] text-cowry-muted text-center">
+                <p className="text-xs text-cowry-muted">
                   Demo: reports stay on this device and reset when you refresh the page.
                 </p>
               </div>
             ) : (
-              /* Inline Report Panel (NOT a modal) */
+              /* Inline Report Panel */
               <div
                 ref={panelRef}
-                className="p-5 bg-slate-50 border-2 border-cowry-primary rounded-2xl space-y-4 shadow-sm"
+                className="p-4 sm:p-5 border border-cowry-hairline rounded-sm bg-white space-y-4"
                 role="region"
                 aria-label="Report buses waiting"
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-cowry-text">
+                <div className="flex items-center justify-between border-b border-cowry-hairline pb-2.5">
+                  <h3 className="font-serif text-base font-bold text-cowry-ink">
                     Report buses waiting
                   </h3>
                   <button
                     type="button"
                     onClick={handleCancelReport}
-                    className="text-xs font-medium text-cowry-muted hover:text-cowry-text p-1 min-h-[32px]"
+                    className="text-xs text-cowry-muted hover:text-cowry-ink p-1 min-h-[32px] rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary"
                     aria-label="Close report panel"
                   >
                     ✕ Close
                   </button>
                 </div>
 
-                {/* Which bus selector (if multiple routes; preselected if 1 route) */}
+                {/* Which bus selector */}
                 {departures.length > 1 ? (
                   <div>
                     <label
@@ -381,7 +375,7 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
                       id="select-report-route"
                       value={selectedRoute}
                       onChange={(e) => setSelectedRoute(e.target.value)}
-                      className="w-full min-h-touch px-3 py-2.5 bg-white border border-cowry-border rounded-xl text-sm font-medium text-cowry-text focus:outline-none focus:ring-2 focus:ring-cowry-primary"
+                      className="w-full min-h-touch px-3 py-2 bg-white border border-cowry-hairline rounded-sm text-sm text-cowry-ink focus:outline-none focus:ring-2 focus:ring-cowry-primary"
                     >
                       {departures.map((dep) => (
                         <option key={dep.route.slug} value={dep.route.slug}>
@@ -392,14 +386,11 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
                   </div>
                 ) : (
                   <div className="text-xs text-cowry-muted">
-                    Route:{" "}
-                    <strong className="text-cowry-text font-semibold">
-                      To {departures[0].headingTo}
-                    </strong>
+                    Route: <strong className="text-cowry-ink font-semibold">To {departures[0].headingTo}</strong>
                   </div>
                 )}
 
-                {/* How many buses are waiting? Row of buttons 0, 1, 2, 3, 4, 5+ */}
+                {/* Count Selection (0 to 5+) */}
                 <div>
                   <span
                     id="count-selection-label"
@@ -410,7 +401,7 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
                   <div
                     role="radiogroup"
                     aria-labelledby="count-selection-label"
-                    className="grid grid-cols-6 gap-1.5"
+                    className="grid grid-cols-6 gap-2 max-w-sm"
                   >
                     {countOptions.map((count) => {
                       const isSelected = selectedCount === count;
@@ -423,16 +414,15 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
                           role="radio"
                           aria-checked={isSelected}
                           onClick={() => setSelectedCount(count)}
-                          className={`min-h-touch flex flex-col items-center justify-center p-2 rounded-xl text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary ${
+                          className={`min-h-touch flex flex-col items-center justify-center p-2 rounded-sm text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary ${
                             isSelected
-                              ? "bg-cowry-pill text-cowry-primary border-2 border-cowry-primary shadow-sm"
-                              : "bg-white text-cowry-text border border-cowry-border hover:bg-slate-100"
+                              ? "bg-white text-cowry-ink border-2 border-cowry-primary"
+                              : "bg-white text-cowry-ink border border-cowry-hairline hover:bg-slate-50"
                           }`}
                         >
                           <span>{displayLabel}</span>
-                          {/* Selection indicator with border AND checkmark (not color alone) */}
                           <span
-                            className={`text-[10px] mt-0.5 leading-none ${
+                            className={`text-[10px] leading-none text-cowry-primary ${
                               isSelected ? "opacity-100" : "opacity-0"
                             }`}
                             aria-hidden="true"
@@ -445,37 +435,29 @@ export default function PlaceBoard({ slug }: PlaceBoardProps) {
                   </div>
                 </div>
 
-                {/* Action Buttons: Send report and Cancel */}
+                {/* Submit & Cancel Buttons */}
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="button"
                     onClick={handleSendReport}
                     disabled={selectedCount === null}
-                    className="flex-1 min-h-touch px-4 py-2.5 bg-cowry-primary text-white rounded-xl text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="min-h-touch px-5 py-2.5 bg-cowry-primary text-white rounded-sm text-sm font-semibold hover:bg-cowry-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     Send report
                   </button>
                   <button
                     type="button"
                     onClick={handleCancelReport}
-                    className="min-h-touch px-4 py-2.5 bg-white border border-cowry-border text-cowry-muted hover:text-cowry-text rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary"
+                    className="min-h-touch px-4 py-2.5 border border-cowry-hairline text-cowry-muted hover:text-cowry-ink rounded-sm text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cowry-primary"
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             )}
-          </section>
+          </div>
         )}
-      </main>
-
-      {/* Footer Strip */}
-      <footer className="mt-auto px-4 py-3.5 bg-cowry-footer border-t border-cowry-border text-center text-xs text-cowry-muted">
-        Unofficial prototype. Sample data. Times are estimates. ·{" "}
-        <Link href="/about" className="underline hover:text-cowry-primary">
-          About this demo
-        </Link>
-      </footer>
+      </div>
     </div>
   );
 }
